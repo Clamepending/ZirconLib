@@ -22,8 +22,8 @@ void loop(void)
   Serial.println("ball sensor 6: " + String(readBall(6)));
   Serial.println("ball sensor 7: " + String(readBall(7)));
   Serial.println("ball sensor 8: " + String(readBall(8)));
-  Serial.println("push button 1: " + String(digitalRead(9)));
-  Serial.println("push button 2: " + String(digitalRead(10)));
+  Serial.println("push button 1: " + String(readButton(1)));
+  Serial.println("push button 2: " + String(readButton(2)));
   Serial.println("orientation: " + String(readCompass()));
   Serial.println("current runtime: " + String(millis()) + " milliseconds");
   Serial.println("--------------------------------------");

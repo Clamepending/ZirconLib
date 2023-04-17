@@ -9,6 +9,8 @@ void InitializeZircon() {
 }
 
 void setZirconVersion() {
+  pinMode(32, INPUT_PULLDOWN);
+
   if (digitalRead(32) == LOW) {
     ZirconVersion = "Mark1";
   } else {
@@ -38,9 +40,15 @@ double readCompass() {
 }
 
 int readBall(int ballSensorNumber) {
-  // ball sensor umbers are from 1 to 8
+  // ball sensor numbers are from 1 to 8
   // so to index into array we subtract 1
-  return analogRead(ballpins[ballSensorNumber - 1]);
+  return 1024 - analogRead(ballpins[ballSensorNumber - 1]); //flip the reading to make more intuitive sense (0 is see nothing)
+}
+
+int readButton(int buttonNumber) {
+  // buttonNumber is from 1 to 2
+  // so to index into array we subtract 1
+  return digitalRead(buttonpins[buttonNumber - 1]);
 }
 
 void motor1(int power, boolean direction) {
@@ -160,6 +168,7 @@ void initializePins() {
   pinMode(buttonpin2, INPUT);
   
   int ballpins[8] = {ballpin1, ballpin2, ballpin3, ballpin4, ballpin5, ballpin6, ballpin7, ballpin8};
+  int buttonpins[2] = {buttonpin1, buttonpin2};
 
 }
 

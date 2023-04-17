@@ -13,6 +13,8 @@ double readCompass();
 
 int readBall(int ballSensorNumber);
 
+int readButton(int buttonNumber);
+
 void motor1(int power, boolean direction);
 
 void motor2(int power, boolean direction);
@@ -45,6 +47,7 @@ int ballpins[8];
 
 const int buttonpin1;
 const int buttonpin2;
+int buttonpins[2];
 
 
 
