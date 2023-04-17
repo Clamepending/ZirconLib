@@ -1,0 +1,27 @@
+{
+    "name": "ZirconLib",
+    "version": "1.0.0",
+    "description": "A library to interface with the Zircon kit. Tutorial: https://zircontutorial.netlify.app/ Sold by: https://www.robomov.net/ ",
+    "keywords": "zircon, robomov",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Clamepending/ZirconLib.git"
+    },
+    "authors": [
+      {
+        "name": "Sota Mark Ogata",
+        "email": "sotaogata777@gmail.com",
+        "url": "markogata.com",
+        "maintainer": true
+      }
+    ],
+    "license": "MIT",
+    "homepage": "https://zircontutorial.netlify.app/",
+    "dependencies": {
+      "adafruit/Adafruit BNO055": "^1.6.1",
+      "SPI": "*"
+    },
+    "frameworks": "*",
+    "platforms": "*"
+  }
+  
