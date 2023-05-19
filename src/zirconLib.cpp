@@ -1,8 +1,37 @@
 #include "zirconLib.h"
+#include <Arduino.h>
 
-Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire);
+Adafruit_BNO055 bno; // Define the Adafruit_BNO055 object
+
+String ZirconVersion;
+
+int motor1dir1;
+int motor1dir2;
+int motor1pwm;
+int motor2dir1;
+int motor2dir2;
+int motor2pwm;
+int motor3dir1;
+int motor3dir2;
+int motor3pwm;
+
+int ballpin1;
+int ballpin2;
+int ballpin3;
+int ballpin4;
+int ballpin5;
+int ballpin6;
+int ballpin7;
+int ballpin8;
+int ballpins[8];
+
+int buttonpin1;
+int buttonpin2;
+int buttonpins[2];
+
 
 void InitializeZircon() {
+  bno = Adafruit_BNO055(55, 0x28, &Wire);
   setZirconVersion();
   initializePins();
   CalibrateCompass();
@@ -25,8 +54,8 @@ void CalibrateCompass() {
   uint8_t system, gyro, accel, mag = 0;
   while (mag < 3 || gyro < 3) {
     bno.getCalibration(&system, &gyro, &accel, &mag);
-    Serial.println("Calibrate your comapass sensor!");
-    Serial.println(String(mag) + "/3 magnitometer");
+    Serial.println("Calibrate your compass sensor!");
+    Serial.println(String(mag) + "/3 magnetometer");
     Serial.println(String(gyro) + "/3 gyroscope");
     Serial.println();
     delay(100);
@@ -51,19 +80,19 @@ int readButton(int buttonNumber) {
   return digitalRead(buttonpins[buttonNumber - 1]);
 }
 
-void motor1(int power, boolean direction) {
-  digitalWrite(motor1dir1, direction);//DIR 1
-  digitalWrite(motor1dir2, !direction);//DIR 2
-  analogWrite(motor1pwm, power);//POWER
+void motor1(int power, bool direction) {
+  digitalWrite(motor1dir1, direction);  // DIR 1
+  digitalWrite(motor1dir2, !direction); // DIR 2
+  analogWrite(motor1pwm, power);        // POWER
 }
 
-void motor2(int power, boolean direction) {
+void motor2(int power, bool direction) {
   digitalWrite(motor2dir1, direction);
   digitalWrite(motor2dir2, !direction);
   analogWrite(motor2pwm, power);
 }
 
-void motor3(int power, boolean direction) {
+void motor3(int power, bool direction) {
   digitalWrite(motor3dir1, direction);
   digitalWrite(motor3dir2, !direction);
   analogWrite(motor3pwm, power);
@@ -71,78 +100,75 @@ void motor3(int power, boolean direction) {
 
 void initializePins() {
   if (ZirconVersion == "Mark1") {
-    const int motor1dir1 = 2;
-    const int motor1dir2 = 5;
-    const int motor1pwm = 3;
-    const int motor2dir1 = 8;
-    const int motor2dir2 = 7;
-    const int motor2pwm = 6;
-    const int motor3dir1 = 12;
-    const int motor3dir2 = 11;
-    const int motor3pwm = 4;
+    motor1dir1 = 2;
+    motor1dir2 = 5;
+    motor1pwm = 3;
+    motor2dir1 = 8;
+    motor2dir2 = 7;
+    motor2pwm = 6;
+    motor3dir1 = 12;
+    motor3dir2 = 11;
+    motor3pwm = 4;
 
-    const int ballpin1 = 14;
-    const int ballpin2 = 15;
-    const int ballpin3 = 16;
-    const int ballpin4 = 17;
-    const int ballpin5 = 20;
-    const int ballpin6 = 21;
-    const int ballpin7 = 22;
-    const int ballpin8 = 23;
+    ballpin1 = 14;
+    ballpin2 = 15;
+    ballpin3 = 16;
+    ballpin4 = 17;
+    ballpin5 = 20;
+    ballpin6 = 21;
+    ballpin7 = 22;
+    ballpin8 = 23;
 
-    const int buttonpin1= 9;
-    const int buttonpin2 = 10;
+    buttonpin1 = 9;
+    buttonpin2 = 10;
 
   } else if (ZirconVersion == "Naveen1") {
-    const int motor1dir1 = 2;
-    const int motor1dir2 = 5;
-    const int motor1pwm = 3;
-    const int motor2dir1 = 8;
-    const int motor2dir2 = 7;
-    const int motor2pwm = 6;
-    const int motor3dir1 = 12;
-    const int motor3dir2 = 11;
-    const int motor3pwm = 4;
+    motor1dir1 = 2;
+    motor1dir2 = 5;
+    motor1pwm = 3;
+    motor2dir1 = 8;
+    motor2dir2 = 7;
+    motor2pwm = 6;
+    motor3dir1 = 12;
+    motor3dir2 = 11;
+    motor3pwm = 4;
 
-    const int ballpin1 = 14;
-    const int ballpin2 = 15;
-    const int ballpin3 = 16;
-    const int ballpin4 = 17;
-    const int ballpin5 = 20;
-    const int ballpin6 = 21;
-    const int ballpin7 = 22;
-    const int ballpin8 = 23;
+    ballpin1 = 14;
+    ballpin2 = 15;
+    ballpin3 = 16;
+    ballpin4 = 17;
+    ballpin5 = 20;
+    ballpin6 = 21;
+    ballpin7 = 22;
+    ballpin8 = 23;
 
-    const int buttonpin1= 9;
-    const int buttonpin2 = 10;
-    
+    buttonpin1 = 9;
+    buttonpin2 = 10;
+
   } else {
-    while (!Serial.available());
-    Serial.println("Zircon Version Not defined!, Check if teensy is properly plugged into the robot circuit board");
-    const int motor1dir1 = 2;
-    const int motor1dir2 = 5;
-    const int motor1pwm = 3;
-    const int motor2dir1 = 8;
-    const int motor2dir2 = 7;
-    const int motor2pwm = 6;
-    const int motor3dir1 = 12;
-    const int motor3dir2 = 11;
-    const int motor3pwm = 4;
+    motor1dir1 = 2;
+    motor1dir2 = 5;
+    motor1pwm = 3;
+    motor2dir1 = 8;
+    motor2dir2 = 7;
+    motor2pwm = 6;
+    motor3dir1 = 12;
+    motor3dir2 = 11;
+    motor3pwm = 4;
 
-    const int ballpin1 = 14;
-    const int ballpin2 = 15;
-    const int ballpin3 = 16;
-    const int ballpin4 = 17;
-    const int ballpin5 = 20;
-    const int ballpin6 = 21;
-    const int ballpin7 = 22;
-    const int ballpin8 = 23;
+    ballpin1 = 14;
+    ballpin2 = 15;
+    ballpin3 = 16;
+    ballpin4 = 17;
+    ballpin5 = 20;
+    ballpin6 = 21;
+    ballpin7 = 22;
+    ballpin8 = 23;
 
-    const int buttonpin1= 9;
-    const int buttonpin2 = 10;
+    buttonpin1 = 9;
+    buttonpin2 = 10;
+    
   }
-
-
 
   //initialize motor pins
   pinMode(motor1dir1, OUTPUT);
@@ -169,6 +195,4 @@ void initializePins() {
   
   int ballpins[8] = {ballpin1, ballpin2, ballpin3, ballpin4, ballpin5, ballpin6, ballpin7, ballpin8};
   int buttonpins[2] = {buttonpin1, buttonpin2};
-
 }
-
