@@ -21,3 +21,5 @@ void motor2(int power, bool direction);
 void motor3(int power, bool direction);
 
 void initializePins();
+
+String getZirconVersion();

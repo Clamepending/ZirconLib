@@ -4,6 +4,7 @@
 Adafruit_BNO055 bno; // Define the Adafruit_BNO055 object
 
 String ZirconVersion;
+boolean compassCalibrated = false;
 
 int motor1dir1;
 int motor1dir2;
@@ -48,24 +49,42 @@ void setZirconVersion() {
 }
 
 void CalibrateCompass() {
-  // TODO: DONT CALIBRATE IF DETECT NO COMPASS
+  
+  if (bno.begin())
+  {
+    // COMPASS DETECTED
+    uint8_t system, gyro, accel, mag = 0;
 
-  bno.begin();
-  uint8_t system, gyro, accel, mag = 0;
-  while (mag < 3 || gyro < 3) {
-    bno.getCalibration(&system, &gyro, &accel, &mag);
-    Serial.println("Calibrate your compass sensor!");
-    Serial.println(String(mag) + "/3 magnetometer");
-    Serial.println(String(gyro) + "/3 gyroscope");
-    Serial.println();
-    delay(100);
+    while (mag < 3 || gyro < 3) {
+      bno.getCalibration(&system, &gyro, &accel, &mag);
+      Serial.println("Calibrate your compass sensor!");
+      Serial.println(String(mag) + "/3 magnetometer");
+      Serial.println(String(gyro) + "/3 gyroscope");
+      Serial.println();
+      delay(100);
+
+    }
+    compassCalibrated = true;
+
+  
+  } else {
+    // NO COMPASS DETECTED
+    compassCalibrated = false;
   }
+
+  
 }
 
 double readCompass() {
-  sensors_event_t orientationData;
-  bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
-  return orientationData.orientation.x;
+  if (compassCalibrated) {
+    sensors_event_t orientationData;
+    bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
+    return orientationData.orientation.x;
+  } else {
+    Serial.println("Trying to read compass but compass is not calibrated! Check if compass is plugged in.");
+    return 0;
+  }
+  
 }
 
 int readBall(int ballSensorNumber) {
@@ -196,3 +215,14 @@ void initializePins() {
   int ballpins[8] = {ballpin1, ballpin2, ballpin3, ballpin4, ballpin5, ballpin6, ballpin7, ballpin8};
   int buttonpins[2] = {buttonpin1, buttonpin2};
 }
+
+String getZirconVersion() {
+  return ZirconVersion;
+}
+
+
+bool isCompassCalibrated() {
+  return compassCalibrated;
+}
+
+
