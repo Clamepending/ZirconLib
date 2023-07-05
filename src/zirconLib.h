@@ -12,6 +12,8 @@ double readCompass();
 
 int readBall(int ballSensorNumber);
 
+int readLine(int lineNumber);
+
 int readButton(int buttonNumber);
 
 void motor1(int power, bool direction);

@@ -6,6 +6,8 @@ Adafruit_BNO055 bno; // Define the Adafruit_BNO055 object
 String ZirconVersion;
 boolean compassCalibrated = false;
 
+#define motorLimit 100
+
 int motor1dir1;
 int motor1dir2;
 int motor1pwm;
@@ -24,18 +26,27 @@ int ballpin5;
 int ballpin6;
 int ballpin7;
 int ballpin8;
+
 int ballpins[8];
 
 int buttonpin1;
 int buttonpin2;
-int buttonpins[2];
+
+int linepin1;
+int linepin2;
+int linepin3;
 
 
 void InitializeZircon() {
-  bno = Adafruit_BNO055(55, 0x28, &Wire);
+  
   setZirconVersion();
   initializePins();
+
+
   CalibrateCompass();
+  
+  
+  
 }
 
 void setZirconVersion() {
@@ -49,17 +60,22 @@ void setZirconVersion() {
 }
 
 void CalibrateCompass() {
+  if (ZirconVersion == "Mark1") {
+    bno = Adafruit_BNO055(55, 0x28, &Wire);
+  } else if (ZirconVersion == "Naveen1") {
+    bno = Adafruit_BNO055(55, 0x28, &Wire2);
+  }
   
   if (bno.begin())
   {
     // COMPASS DETECTED
     uint8_t system, gyro, accel, mag = 0;
 
-    while (mag < 3 || gyro < 3) {
+    while (mag < 3) {
       bno.getCalibration(&system, &gyro, &accel, &mag);
       Serial.println("Calibrate your compass sensor!");
       Serial.println(String(mag) + "/3 magnetometer");
-      Serial.println(String(gyro) + "/3 gyroscope");
+      // Serial.println(String(gyro) + "/3 gyroscope");
       Serial.println();
       delay(100);
 
@@ -90,31 +106,129 @@ double readCompass() {
 int readBall(int ballSensorNumber) {
   // ball sensor numbers are from 1 to 8
   // so to index into array we subtract 1
-  return 1024 - analogRead(ballpins[ballSensorNumber - 1]); //flip the reading to make more intuitive sense (0 is see nothing)
+  int ballpin;
+  switch (ballSensorNumber) {
+    case 1:
+      ballpin = ballpin1; // Replace with the appropriate pin for sensor 1
+      break;
+    case 2:
+      ballpin = ballpin2; // Replace with the appropriate pin for sensor 2
+      break;
+    case 3:
+      ballpin = ballpin3; // Replace with the appropriate pin for sensor 3
+      break;
+    case 4:
+      ballpin = ballpin4; // Replace with the appropriate pin for sensor 4
+      break;
+    case 5:
+      ballpin = ballpin5; // Replace with the appropriate pin for sensor 5
+      break;
+    case 6:
+      ballpin = ballpin6; // Replace with the appropriate pin for sensor 6
+      break;
+    case 7:
+      ballpin = ballpin7; // Replace with the appropriate pin for sensor 7
+      break;
+    case 8:
+      ballpin = ballpin8; // Replace with the appropriate pin for sensor 8
+      break;
+    default:
+      // Invalid sensor number, return an error value or handle it as desired
+      Serial.println("Trying to read invalid ball sensor number: " + String(ballSensorNumber));
+      return -1;
+  }
+
+  return 1024 - analogRead(ballpin);
 }
 
 int readButton(int buttonNumber) {
   // buttonNumber is from 1 to 2
   // so to index into array we subtract 1
-  return digitalRead(buttonpins[buttonNumber - 1]);
+  if (buttonNumber == 1) {
+    return digitalRead(buttonpin1);
+  } else if (buttonNumber == 2) {
+    return digitalRead(buttonpin2);
+  } else {
+    Serial.println("Trying to read invalid button number: " + String(buttonNumber));
+    return 0;
+  }
 }
 
+int readLine(int lineNumber) {
+  // buttonNumber is from 1 to 3
+  // so to index into array we subtract 1
+  if (lineNumber == 1) {
+    return analogRead(linepin1);
+  } else if (lineNumber == 2) {
+    return analogRead(linepin2);
+  } else if (lineNumber == 3) {
+    return analogRead(linepin3);
+  } else {
+    Serial.println("Trying to read invalid button number: " + String(lineNumber));
+    return 0;
+  }
+}
+
+
 void motor1(int power, bool direction) {
-  digitalWrite(motor1dir1, direction);  // DIR 1
-  digitalWrite(motor1dir2, !direction); // DIR 2
-  analogWrite(motor1pwm, power);        // POWER
+  power = min(power, motorLimit);
+  if (ZirconVersion == "Naveen1") {
+    if (direction == 0) {
+      analogWrite(motor1dir1, 0);  // DIR 1
+      analogWrite(motor1dir2, power);  // DIR 2
+    } else {
+      analogWrite(motor1dir1, power);  // DIR 1
+      analogWrite(motor1dir2, 0);  // DIR 2
+    }
+
+  } else if (ZirconVersion == "Mark1") {
+    digitalWrite(motor1dir1, direction);  // DIR 1
+    digitalWrite(motor1dir2, !direction); // DIR 2
+    analogWrite(motor1pwm, power);        // POWER
+  } else {
+    Serial.println("Zircon version not defined");
+  }
+  
 }
 
 void motor2(int power, bool direction) {
-  digitalWrite(motor2dir1, direction);
-  digitalWrite(motor2dir2, !direction);
-  analogWrite(motor2pwm, power);
+  power = min(power, motorLimit);
+  if (ZirconVersion == "Naveen1") {
+    if (direction == 0) {
+      analogWrite(motor2dir1, 0);  // DIR 1
+      analogWrite(motor2dir2, power);  // DIR 2
+    } else {
+      analogWrite(motor2dir1, power);  // DIR 1
+      analogWrite(motor2dir2, 0);  // DIR 2
+    }
+
+  } else if (ZirconVersion == "Mark1") {
+    digitalWrite(motor2dir1, direction);  // DIR 1
+    digitalWrite(motor2dir2, !direction); // DIR 2
+    analogWrite(motor2pwm, power);        // POWER
+  } else {
+    Serial.println("Zircon version not defined");
+  }
 }
 
 void motor3(int power, bool direction) {
-  digitalWrite(motor3dir1, direction);
-  digitalWrite(motor3dir2, !direction);
-  analogWrite(motor3pwm, power);
+  power = min(power, motorLimit);
+  if (ZirconVersion == "Naveen1") {
+    if (direction == 0) {
+      analogWrite(motor3dir1, 0);  // DIR 1
+      analogWrite(motor3dir2, power);  // DIR 2
+    } else {
+      analogWrite(motor3dir1, power);  // DIR 1
+      analogWrite(motor3dir2, 0);  // DIR 2
+    }
+
+  } else if (ZirconVersion == "Mark1") {
+    digitalWrite(motor3dir1, direction);  // DIR 1
+    digitalWrite(motor3dir2, !direction); // DIR 2
+    analogWrite(motor3pwm, power);        // POWER
+  } else {
+    Serial.println("Zircon version not defined");
+  }
 }
 
 void initializePins() {
@@ -125,9 +239,10 @@ void initializePins() {
     motor2dir1 = 8;
     motor2dir2 = 7;
     motor2pwm = 6;
-    motor3dir1 = 12;
-    motor3dir2 = 11;
+    motor3dir1 = 11;
+    motor3dir2 = 12;
     motor3pwm = 4;
+
 
     ballpin1 = 14;
     ballpin2 = 15;
@@ -140,29 +255,37 @@ void initializePins() {
 
     buttonpin1 = 9;
     buttonpin2 = 10;
+
+    linepin1 = A11;
+    linepin2 = A13;
+    linepin3 = A12;
 
   } else if (ZirconVersion == "Naveen1") {
-    motor1dir1 = 2;
-    motor1dir2 = 5;
-    motor1pwm = 3;
-    motor2dir1 = 8;
+    motor1dir1 = 3;
+    motor1dir2 = 4;
+    // motor1pwm = 3;
+    motor2dir1 = 6;
     motor2dir2 = 7;
-    motor2pwm = 6;
-    motor3dir1 = 12;
-    motor3dir2 = 11;
-    motor3pwm = 4;
+    // motor2pwm = 6;
+    motor3dir1 = 5;
+    motor3dir2 = 2;
+    // motor3pwm = 4;
 
-    ballpin1 = 14;
-    ballpin2 = 15;
-    ballpin3 = 16;
-    ballpin4 = 17;
-    ballpin5 = 20;
-    ballpin6 = 21;
-    ballpin7 = 22;
-    ballpin8 = 23;
+    ballpin1 = 20;
+    ballpin2 = 21;
+    ballpin3 = 14;
+    ballpin4 = 15;
+    ballpin5 = 16;
+    ballpin6 = 17;
+    ballpin7 = 18;
+    ballpin8 = 19;
 
-    buttonpin1 = 9;
+    buttonpin1 = 8;
     buttonpin2 = 10;
+
+    linepin1 = A8;
+    linepin2 = A9;
+    linepin3 = A12;
 
   } else {
     motor1dir1 = 2;
@@ -186,6 +309,10 @@ void initializePins() {
 
     buttonpin1 = 9;
     buttonpin2 = 10;
+
+    linepin1 = A11;
+    linepin2 = A13;
+    linepin3 = A12;
     
   }
 
@@ -212,8 +339,6 @@ void initializePins() {
   pinMode(buttonpin1, INPUT);
   pinMode(buttonpin2, INPUT);
   
-  int ballpins[8] = {ballpin1, ballpin2, ballpin3, ballpin4, ballpin5, ballpin6, ballpin7, ballpin8};
-  int buttonpins[2] = {buttonpin1, buttonpin2};
 }
 
 String getZirconVersion() {
