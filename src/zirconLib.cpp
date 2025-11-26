@@ -37,16 +37,16 @@ int linepin2;
 int linepin3;
 
 
-void InitializeZircon() {
-  
-  setZirconVersion();
-  initializePins();
+void InitializeZircon(int hardwareVersion) {
+  if (hardwareVersion == 15) {
+    ZirconVersion = "Mark1";
+  } else {
+    setZirconVersion();
+  }
 
+  initializePins(hardwareVersion);
 
   CalibrateCompass();
-  
-  
-  
 }
 
 void setZirconVersion() {
@@ -231,7 +231,7 @@ void motor3(int power, bool direction) {
   }
 }
 
-void initializePins() {
+void initializePins(int hardwareVersion) {
   if (ZirconVersion == "Mark1") {
     motor1dir1 = 2;
     motor1dir2 = 5;
@@ -314,6 +314,40 @@ void initializePins() {
     linepin2 = A13;
     linepin3 = A12;
     
+  }
+
+  // Apply swapping logic for Hardware Version 15
+  if (hardwareVersion == 15) {
+    // Store original Mark1 pin assignments
+    int oldM1d1 = motor1dir1;
+    int oldM1d2 = motor1dir2;
+    int oldM1pwm = motor1pwm;
+
+    int oldM2d1 = motor2dir1;
+    int oldM2d2 = motor2dir2;
+    int oldM2pwm = motor2pwm;
+
+    int oldM3d1 = motor3dir1;
+    int oldM3d2 = motor3dir2;
+    int oldM3pwm = motor3pwm;
+
+    // Current Motor 2 on software should be Motor 1 hardware
+    // So software motor2 variables get Motor 1 pins
+    motor2dir1 = oldM1d1;
+    motor2dir2 = oldM1d2;
+    motor2pwm = oldM1pwm;
+
+    // Current Motor 1 on software should be Motor 3 hardware
+    // So software motor1 variables get Motor 3 pins
+    motor1dir1 = oldM3d1;
+    motor1dir2 = oldM3d2;
+    motor1pwm = oldM3pwm;
+
+    // Current Motor 3 on software should be Motor 2 hardware
+    // So software motor3 variables get Motor 2 pins
+    motor3dir1 = oldM2d1;
+    motor3dir2 = oldM2d2;
+    motor3pwm = oldM2pwm;
   }
 
   //initialize motor pins
