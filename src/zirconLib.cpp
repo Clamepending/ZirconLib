@@ -323,13 +323,13 @@ void initializePins(int hardwareVersion) {
     int oldM1d2 = motor1dir2;
     int oldM1pwm = motor1pwm;
 
-    int oldM2d1 = motor2dir1;
-    int oldM2d2 = motor2dir2;
-    int oldM2pwm = motor2pwm;
+    int oldM2d1 = motor3dir1;
+    int oldM2d2 = motor3dir2;
+    int oldM2pwm = motor3pwm;
 
-    int oldM3d1 = motor3dir1;
-    int oldM3d2 = motor3dir2;
-    int oldM3pwm = motor3pwm;
+    int oldM3d1 = motor2dir1;
+    int oldM3d2 = motor2dir2;
+    int oldM3pwm = motor2pwm;
 
     // Current Motor 2 on software should be Motor 1 hardware
     // So software motor2 variables get Motor 1 pins
