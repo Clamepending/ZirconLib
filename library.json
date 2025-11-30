@@ -1,6 +1,6 @@
 {
     "name": "ZirconLib",
-    "version": "1.0.36",
+    "version": "1.0.37",
     "description": "A library to interface with the Zircon kit. Tutorial: https://zircontutorial.netlify.app/ Sold by: https://www.robomov.net/ ",
     "keywords": [
       "zircon",
